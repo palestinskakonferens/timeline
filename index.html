@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malmö Solidarity Timeline</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: #f5f5f5;
+      height: 100%;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .timeline-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 60px 40px;
+      overflow-y: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    .header h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      color: #00A650;
+      text-shadow: 0 0 20px rgba(0, 166, 80, 0.6), 0 0 40px rgba(0, 166, 80, 0.3);
+    }
+
+    .header p {
+      font-size: 20px;
+      color: #c0c0c0;
+      margin: 0;
+      font-weight: 300;
+    }
+
+    .timeline {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #EE2A35 0%, #00A650 100%);
+      border-radius: 2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 60px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      animation: slideIn 0.6s ease-out forwards;
+    }
+
+    .timeline-item:nth-child(odd) {
+      flex-direction: row;
+    }
+
+    .timeline-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+    .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+    .timeline-item:nth-child(8) { animation-delay: 0.8s; }
+    .timeline-item:nth-child(9) { animation-delay: 0.9s; }
+
+    .timeline-content {
+      width: 45%;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 166, 80, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .timeline-content:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #EE2A35;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(238, 42, 53, 0.4);
+    }
+
+    .timeline-date {
+      display: inline-block;
+      background: #000000;
+      color: #ffffff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px solid #00A650;
+    }
+
+    .timeline-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .event-type {
+      display: inline-block;
+      background: rgba(238, 42, 53, 0.15);
+      color: #EE2A35;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      border: 1px solid rgba(238, 42, 53, 0.4);
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: #ffffff;
+      border: 4px solid #000000;
+      border-radius: 50%;
+      z-index: 2;
+      box-shadow: 0 0 16px rgba(0, 166, 80, 0.5);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 166, 80, 0.4);
+      border-radius: 12px;
+      color: #f5f5f5;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #00A650;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .search-box input::placeholder {
+      color: #999;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: #999;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 166, 80, 0.4);
+      border-radius: 12px;
+      color: #f5f5f5;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #00A650;
+    }
+
+    .filter-btn.active {
+      background: #EE2A35;
+      border-color: #EE2A35;
+      color: #ffffff;
+    }
+
+    .timeline-item.hidden {
+      display: none;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+      font-size: 18px;
+    }
+
+    .get-involved-btn {
+      padding: 16px 40px;
+      background: linear-gradient(120deg, #EE2A35, #00A650);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(238, 42, 53, 0.3);
+    }
+
+    .get-involved-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(238, 42, 53, 0.5);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      border: 2px solid #00A650;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      position: relative;
+      animation: slideIn 0.4s ease;
+      box-shadow: 0 8px 32px rgba(0, 166, 80, 0.4);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      background: #EE2A35;
+      border-color: #EE2A35;
+    }
+
+    .modal-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #00A650;
+      margin: 0 0 20px 0;
+      padding-right: 40px;
+    }
+
+    .modal-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #d8d8d8;
+      margin: 0 0 16px 0;
+    }
+
+    .campaign-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .campaign-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 166, 80, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      text-decoration: none;
+      color: #ffffff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: block;
+    }
+
+    .campaign-btn:hover {
+      background: rgba(238, 42, 53, 0.1);
+      border-color: #EE2A35;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(238, 42, 53, 0.3);
+    }
+
+    .campaign-btn-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #00A650;
+    }
+
+    .campaign-btn-desc {
+      font-size: 14px;
+      color: #c0c0c0;
+      line-height: 1.4;
+    }
+
+    .modal-footer {
+      font-size: 16px;
+      color: #c0c0c0;
+      text-align: center;
+      margin: 24px 0 0 0;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .timeline-container {
+        padding: 40px 20px;
+      }
+
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .header p {
+        font-size: 16px;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box {
+        min-width: 100%;
+      }
+
+      .filter-buttons {
+        justify-content: center;
+      }
+
+      .timeline::before {
+        left: 20px;
+      }
+
+      .timeline-item {
+        flex-direction: column !important;
+        align-items: flex-start;
+        padding-left: 50px;
+      }
+
+      .timeline-content {
+        width: 100%;
+      }
+
+      .timeline-dot {
+        left: 20px;
+      }
+
+      .campaign-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 30px 20px;
+      }
+
+      .modal-title {
+        font-size: 22px;
+      }
+
+      .get-involved-btn {
+        font-size: 16px;
+        padding: 14px 30px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <main class="timeline-container">
+   <header class="header">
+    <h1 id="main-title">Malmö Solidarity Actions</h1>
+    <p id="subtitle">A Timeline of Community Activism and Organizing</p>
+   </header>
+   <div class="controls">
+    <div class="search-box">
+     <svg class="search-icon" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle> <path d="M21 21l-4.35-4.35"></path>
+     </svg><input type="text" id="searchInput" placeholder="Search events...">
+    </div>
+    <div class="filter-buttons"><button class="filter-btn active" data-filter="all">All</button> <button class="filter-btn" data-filter="campaign">Campaigns</button> <button class="filter-btn" data-filter="cultural">Cultural</button> <button class="filter-btn" data-filter="organizing">Organizing</button> <button class="filter-btn" data-filter="victory">Victories</button>
+    </div>
+   </div>
+   <div class="timeline" id="timeline"></div>
+   <div class="no-results" id="noResults" style="display: none;">
+    No events found matching your search.
+   </div>
+   <div style="text-align: center; margin-top: 60px; padding-bottom: 40px;"><button id="getInvolvedBtn" class="get-involved-btn"> Join the Movement – Get Involved Today </button>
+   </div>
+  </main><!-- Modal -->
+  <div id="campaignModal" class="modal">
+   <div class="modal-content"><button class="modal-close" id="closeModal">×</button>
+    <h2 class="modal-title">Help Make the Next Campaign a Success!</h2>
+    <p class="modal-text">Every victory on this timeline happened because people like you took action. The movement is growing, and we need your energy, skills, and solidarity to keep the momentum going.</p>
+    <p class="modal-text"><strong>Choose a campaign to support:</strong></p>
+    <div class="campaign-buttons"><a href="https://www.instagram.com/rattvisamalmo/" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Rättvisa Malmö
+      </div>
+      <div class="campaign-btn-desc">
+       Vi köper det inte
+      </div></a> <a href="https://www.volvoclawsoffpalestine.com/" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Volvo Claws Off Palestine
+      </div>
+      <div class="campaign-btn-desc">
+       Join the Volvo Campaign
+      </div></a> <a href="https://academicboycott.org" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Academic Boycott
+      </div>
+      <div class="campaign-btn-desc">
+       Support the academic boycott
+      </div></a> <a href="https://apartheidfree.org" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Apartheid Free Zones
+      </div>
+      <div class="campaign-btn-desc">
+       Join the Apartheid Free Zones campaign!
+      </div></a>
+    </div>
+    <p class="modal-footer">Together, we're building a more just world. Every action counts.</p>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      timeline_title: "Malmö Solidarity Actions",
+      timeline_subtitle: "A Timeline of Community Activism and Organizing",
+      background_color: "#0d0d0d",
+      surface_color: "rgba(255, 255, 255, 0.03)",
+      text_color: "#f5f5f5",
+      primary_action_color: "#EE2A35",
+      secondary_action_color: "#00A650",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+
+    const timelineEvents = [
+      { date: "10-07-2023", title: "First demonstration in Malmö", type: "organizing" },
+      { date: "11-07-2023 - 15-07-2023", title: "Daily manifestations at Gustav", type: "organizing" },
+      { date: "30-10-2023", title: "Second open meeting to organise for Palestine", type: "organizing" },
+      { date: "01-11-2023", title: "Queers for Palestine is created", type: "organizing" },
+      { date: "01-11-2023", title: "Isolera starts research on AP’s involvement", type: "campaign" },
+      { date: "20-11-2023", title: "ETC publishes Isolera’s research on AP’s contract with Emtan", type: "campaign" },
+      { date: "23-11-2023", title: "Hayna first manifestation at Möllevångstorget", type: "organizing" },
+      { date: "27-11-2023", title: "Hayna event at ABF with Omar Barghouti on BDS", type: "cultural" },
+      { date: "15-12-2023", title: "Isolera AP campaign launch with demo outside AP", type: "campaign" },
+      { date: "28-01-2024", title: "Stoppa Israel is created as a campaign", type: "campaign" },
+      { date: "01-02-2024", title: "Weekly sit‑ins inside the municipality reception", type: "organizing" },
+      { date: "12-02-2024", title: "Latinos for Palestine first meeting", type: "organizing" },
+      { date: "14-02-2024", title: "Isolera’s research used in a foreign policy debate in parliament", type: "victory" },
+      { date: "25-02-2024", title: "XXL stops selling AP products after pressure", type: "victory" },
+      { date: "25-02-2024", title: "Första Stordemonstrationen – Skånes största demonstration", type: "organizing" },
+      { date: "02-03-2024", title: "CDON ends sales of AP products", type: "victory" },
+      { date: "08-03-2024", title: "Latinos for Palestine organizes first feminist dance", type: "cultural" },
+      { date: "15-03-2024", title: "BDS Sverige Launch", type: "organizing" },
+      { date: "03-04-2024", title: "Stoppa Israel email campaign to Malmö City Council", type: "campaign" },
+      { date: "09-04-2024", title: "Runners for Palestine first run through Malmö", type: "organizing" },
+      { date: "10-04-2024", title: "Protest outside Stadshuset against Malmö hosting Eurovision", type: "campaign" },
+      { date: "23-04-2024", title: "ETC publishes Isolera’s research on AP products used for IOF training", type: "campaign" },
+      { date: "23-04-2024", title: "DN publishes Isolera’s research; AP CEO Lennart comments", type: "campaign" },
+      { date: "23-04-2024", title: "Eurovision Street is cancelled", type: "victory" },
+      { date: "24-04-2024", title: "Moriskan skips Eurovision", type: "cultural" },
+      { date: "25-04-2024", title: "Latinos for Palestine Noche Cultural", type: "cultural" },
+      { date: "26-04-2024", title: "ETC publishes new research on AP products used by Netza Yehuda Battalion", type: "campaign" },
+      { date: "04-04-2024", title: "Eurovision campaign launch (Isolera)", type: "campaign" },
+      { date: "07-05-2024", title: "First Apartheid Free Zones (Manto & Amalthea)", type: "victory" },
+      { date: "08-05-2024", title: "Ship to Gaza – Handala arrives in Malmö", type: "cultural" },
+      { date: "09-05-2024", title: "Eurovision Big Demo 1", type: "organizing" },
+      { date: "11-05-2024", title: "Eurovision Big Demo 2", type: "organizing" },
+      { date: "11-05-2024", title: "Emporia flag/banner drop", type: "organizing" },
+      { date: "11-05-2024", title: "Eurovision stage sit‑in", type: "organizing" },
+      { date: "12-05-2024", title: "Ta tillbaka parken", type: "organizing" },
+      { date: "14-05-2024", title: "Student encampments start", type: "organizing" },
+      { date: "13-06-2024", title: "Marcha del Silencio", type: "organizing" },
+      { date: "28-06-2024", title: "Almedalen Week", type: "organizing" },
+      { date: "06-07-2024", title: "No Pride in Genocide", type: "organizing" },
+      { date: "11-07-2024", title: "Lidl campaign starts", type: "campaign" },
+      { date: "28-07-2024", title: "Stoppa Israel becomes a network", type: "organizing" },
+      { date: "07-09-2024", title: "Big demos in 10 cities – ‘Ingen handel med apartheidstaten’", type: "organizing" },
+      { date: "17-09-2024", title: "Flyers about AP handed out at Job Fair for youth", type: "campaign" },
+      { date: "18-09-2024", title: "Marcha del Silencio", type: "organizing" },
+      { date: "06-10-2024", title: "Big demonstration", type: "organizing" },
+      { date: "06-10-2024", title: "Banners put up all over Malmö", type: "organizing" },
+      { date: "17-10-2024", title: "Healthcare Workers + Latinos for Palestine event with Gaza medical staff", type: "cultural" },
+      { date: "29-10-2024", title: "Nobel campaign launch", type: "campaign" },
+      { date: "03-11-2024", title: "Sakan sessions start", type: "cultural" },
+      { date: "22-11-2024", title: "Nobel campaign win", type: "victory" },
+      { date: "29-11-2024", title: "Big demos in 11 cities – ‘Sverige ska säga nej till folkmord’", type: "organizing" },
+      { date: "13-12-2024", title: "Lucia for Palestine", type: "cultural" },
+      { date: "29-12-2024", title: "Die‑in at Emporia", type: "organizing" },
+      { date: "28-01-2025", title: "Flyer rain at Emporia", type: "organizing" },
+      { date: "01-02-2025", title: "Daily protests outside AP", type: "campaign" },
+      { date: "02-03-2025", title: "Big demos in 10 cities", type: "organizing" },
+      { date: "02-03-2025", title: "Omar Barghouti Talks Tour", type: "cultural" },
+      { date: "03-03-2025", title: "Israeli Apartheid Week in 12+ Swedish universities", type: "cultural" },
+      { date: "25-04-2025", title: "Isolera speech at Malmö antifa demo celebrating fall of fascism in Italy", type: "cultural" },
+      { date: "03-05-2025", title: "Boycott March", type: "organizing" },
+      { date: "12-05-2025", title: "Al Nakba Week", type: "cultural" },
+      { date: "07-06-2025", title: "Demo against AP in Hyllie for AP’s 50‑year celebration", type: "campaign" },
+      { date: "24-06-2025", title: "Almedalen Week", type: "organizing" },
+      { date: "30-06-2025", title: "Hunger strike starts", type: "organizing" },
+      { date: "07-07-2025", title: "Rättvisa Malmö campaign launch", type: "campaign" },
+      { date: "23-07-2025", title: "Camp Hurriya calls for mass action against AP", type: "organizing" },
+      { date: "25-07-2025", title: "Sydsvenskan: AP stops all export of red dot sights to Israel (AP win)", type: "victory" },
+      { date: "11-09-2025", title: "Camp Hurriya", type: "organizing" },
+      { date: "15-09-2025", title: "Early morning demo against Volvo Group", type: "campaign" },
+      { date: "02-11-2025", title: "SVT pressure campaign to exclude Israel from Eurovision starts", type: "campaign" },
+      { date: "06-12-2025", title: "Palestinska Konferens", type: "cultural" }
+    ];
+
+    const eventTypeLabels = {
+      campaign: 'Campaign',
+      cultural: 'Cultural',
+      organizing: 'Organizing',
+      victory: 'Victory'
+    };
+
+    function renderTimeline() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = '';
+
+      timelineEvents.forEach((event, index) => {
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+        item.dataset.type = event.type;
+        item.dataset.title = event.title.toLowerCase();
+        item.dataset.date = event.date;
+        
+        const content = document.createElement('div');
+        content.className = 'timeline-content';
+        
+        content.innerHTML = `
+          <span class="timeline-date">${event.date}</span>
+          <h3 class="timeline-title">${event.title}</h3>
+          <span class="event-type">${eventTypeLabels[event.type]}</span>
+        `;
+        
+        const dot = document.createElement('div');
+        dot.className = 'timeline-dot';
+        
+        item.appendChild(content);
+        item.appendChild(dot);
+        timeline.appendChild(item);
+      });
+    }
+
+    function filterEvents(filterType) {
+      const items = document.querySelectorAll('.timeline-item');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        if (filterType === 'all' || item.dataset.type === filterType) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      updateNoResultsMessage(visibleCount);
+    }
+
+    function searchEvents(searchTerm) {
+      const items = document.querySelectorAll('.timeline-item');
+      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const matchesSearch = item.dataset.title.includes(searchTerm.toLowerCase());
+        const matchesFilter = activeFilter === 'all' || item.dataset.type === activeFilter;
+
+        if (matchesSearch && matchesFilter) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      updateNoResultsMessage(visibleCount);
+    }
+
+    function updateNoResultsMessage(visibleCount) {
+      const noResults = document.getElementById('noResults');
+      const timeline = document.getElementById('timeline');
+
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+        timeline.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        timeline.style.display = 'block';
+      }
+    }
+
+    // Set up event listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchEvents(e.target.value);
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const searchTerm = document.getElementById('searchInput').value;
+        if (searchTerm) {
+          searchEvents(searchTerm);
+        } else {
+          filterEvents(btn.dataset.filter);
+        }
+      });
+    });
+
+    async function onConfigChange(config) {
+      const titleElement = document.getElementById('main-title');
+      const subtitleElement = document.getElementById('subtitle');
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      titleElement.textContent = config.timeline_title || defaultConfig.timeline_title;
+      subtitleElement.textContent = config.timeline_subtitle || defaultConfig.timeline_subtitle;
+
+      titleElement.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      subtitleElement.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+
+      titleElement.style.fontSize = `${baseSize * 3}px`;
+      subtitleElement.style.fontSize = `${baseSize * 1.25}px`;
+
+      document.body.style.background = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+
+      const timelineContents = document.querySelectorAll('.timeline-content');
+      timelineContents.forEach(content => {
+        content.style.background = config.surface_color || defaultConfig.surface_color;
+      });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              config.secondary_action_color = value;
+              window.elementSdk.setConfig({ secondary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["timeline_title", config.timeline_title || defaultConfig.timeline_title],
+        ["timeline_subtitle", config.timeline_subtitle || defaultConfig.timeline_subtitle]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    renderTimeline();
+
+    // Modal functionality
+    const modal = document.getElementById('campaignModal');
+    const getInvolvedBtn = document.getElementById('getInvolvedBtn');
+    const closeModalBtn = document.getElementById('closeModal');
+    let modalShown = false;
+    let startTime = Date.now();
+
+    function openModal() {
+      modal.classList.add('show');
+      modalShown = true;
+    }
+
+    function closeModal() {
+      modal.classList.remove('show');
+    }
+
+    // Open modal on button click
+    getInvolvedBtn.addEventListener('click', openModal);
+
+    // Close modal on X button
+    closeModalBtn.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Auto-open modal after 30 seconds of activity
+    setInterval(() => {
+      const elapsedTime = (Date.now() - startTime) / 1000;
+      if (elapsedTime >= 30 && !modalShown) {
+        openModal();
+      }
+    }, 1000);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a923138355499fc',t:'MTc2NDkyMzUzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
