@@ -510,18 +510,24 @@
       </div>
       <div class="campaign-btn-desc">
        Join the Volvo Campaign
-      </div></a> <a href="https://academicboycott.org" target="_blank" rel="noopener noreferrer" class="campaign-btn">
-      <div class="campaign-btn-title">
-       Academic Boycott
-      </div>
-      <div class="campaign-btn-desc">
-       Support the academic boycott
-      </div></a> <a href="https://apartheidfree.org" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      </div></a> <a href="https://www.bdssverige.com/afz" target="_blank" rel="noopener noreferrer" class="campaign-btn">
       <div class="campaign-btn-title">
        Apartheid Free Zones
       </div>
       <div class="campaign-btn-desc">
        Join the Apartheid Free Zones campaign!
+      </div></a> <a href="https://lundstudentsforpalestine.com/" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Academic Boycott Lund University
+      </div>
+      <div class="campaign-btn-desc">
+       Support Lund Students for Palestine
+      </div></a> <a href="https://www.instagram.com/malmostudentsforpalestine/" target="_blank" rel="noopener noreferrer" class="campaign-btn">
+      <div class="campaign-btn-title">
+       Academic Boycott Malmö University
+      </div>
+      <div class="campaign-btn-desc">
+       Support Malmö Students for Palestine
       </div></a>
     </div>
     <p class="modal-footer">Together, we're building a more just world. Every action counts.</p>
@@ -608,7 +614,7 @@
       { date: "30-06-2025", title: "Hunger strike starts", type: "organizing" },
       { date: "07-07-2025", title: "Rättvisa Malmö campaign launch", type: "campaign" },
       { date: "23-07-2025", title: "Camp Hurriya calls for mass action against AP", type: "organizing" },
-      { date: "25-07-2025", title: "Sydsvenskan: AP stops all export of red dot sights to Israel (AP win)", type: "victory" },
+      { date: "25-07-2025", title: "Aimpoint stops all export of red dot sights to Israel (Sydsvenskan report)", type: "victory" },
       { date: "11-09-2025", title: "Camp Hurriya", type: "organizing" },
       { date: "15-09-2025", title: "Early morning demo against Volvo Group", type: "campaign" },
       { date: "02-11-2025", title: "SVT pressure campaign to exclude Israel from Eurovision starts", type: "campaign" },
@@ -849,10 +855,10 @@
       }
     });
 
-    // Auto-open modal after 30 seconds of activity
+    // Auto-open modal after 15 seconds of activity
     setInterval(() => {
       const elapsedTime = (Date.now() - startTime) / 1000;
-      if (elapsedTime >= 30 && !modalShown) {
+      if (elapsedTime >= 15 && !modalShown) {
         openModal();
       }
     }, 1000);
